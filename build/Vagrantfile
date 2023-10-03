@@ -8,10 +8,14 @@
     config.vm.synced_folder "..", "/home/c3c/source"
     cmake_build_type = ENV['CMAKE_BUILD_TYPE'] || 'Debug' # Use a default value if not set
     llvm_version =  ENV['C3_LLVM_VERSION'] || '16' # Use a default value if not set
-  
+
     Vagrant::Config.run do |config|
         config.ssh.forward_agent = true
      end
+
+    config.vm.provider "virtualbox" do |vb|
+      vb.cpus = 1
+    end
 
     # Shell provisioner to load the docker image from a tar file and run it
     config.vm.provision "shell", inline: <<-SHELL
