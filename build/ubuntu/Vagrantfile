@@ -5,7 +5,7 @@
     config.vm.box_version = "0.0.1"
     config.ssh.shell = "ash"
     config.vbguest.auto_update = false
-    config.vm.synced_folder "..", "/home/c3c/source"
+    config.vm.synced_folder "../..", "/home/c3c/source"
     cmake_build_type = ENV['CMAKE_BUILD_TYPE'] || 'Debug' # Use a default value if not set
     llvm_version =  ENV['C3_LLVM_VERSION'] || '16' # Use a default value if not set
 
