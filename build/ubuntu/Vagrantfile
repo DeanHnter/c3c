@@ -1,0 +1,35 @@
+  Vagrant.configure("2") do |config|
+
+    # The Vagrant box to load
+    config.vm.box = "deanhnter/c3-builder-docker-llvm16"
+    config.vm.box_version = "0.0.1"
+    config.ssh.shell = "ash"
+    config.vbguest.auto_update = false
+    config.vm.synced_folder "..", "/home/c3c/source"
+    cmake_build_type = ENV['CMAKE_BUILD_TYPE'] || 'Debug' # Use a default value if not set
+    llvm_version =  ENV['C3_LLVM_VERSION'] || '16' # Use a default value if not set
+
+    Vagrant::Config.run do |config|
+        config.ssh.forward_agent = true
+     end
+
+    config.vm.provider "virtualbox" do |vb|
+      vb.cpus = 1
+    end
+
+    # Shell provisioner to load the docker image from a tar file and run it
+    config.vm.provision "shell", inline: <<-SHELL
+      echo "export CMAKE_BUILD_TYPE='#{cmake_build_type}'" >> $HOME/.bash_profile
+      echo "export LLVM_VERSION='#{llvm_version}'" >> $HOME/.bash_profile
+      source $HOME/.bash_profile
+      cd /home/c3c/source
+      mkdir -p build bin
+      docker run -i \
+          -e CXX=clang++-$LLVM_VERSION \
+          -e CMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
+          -e C3_LLVM_VERSION=$LLVM_VERSION \
+          -v /home/c3c/source:/home/c3c/source \
+          -w /home/c3c/source c3builderubuntu:23.10 bash -c \
+        "cd build && cmake -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE -DC3_LLVM_VERSION=$LLVM_VERSION .. && cmake --build . && mv c3c lib ../bin/"
+    SHELL
+  end
