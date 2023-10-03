@@ -24,4 +24,5 @@ jobs:
 
     - name: Run build
       run: |
+        vagrant plugin install vagrant-vbguest
         cd build && vagrant up
