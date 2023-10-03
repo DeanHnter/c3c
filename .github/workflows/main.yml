@@ -11,7 +11,7 @@ env:
 
 jobs:
   build-linux:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     strategy:
       # abort runners if a single one fails
       fail-fast: true
@@ -21,23 +21,6 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
-
-    - name: Install VirtualBox
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y virtualbox
-
-    - name: Install Vagrant
-      run: |
-        curl -O https://releases.hashicorp.com/vagrant/2.3.7/vagrant_2.3.7-1_amd64.deb
-        sudo dpkg -i vagrant_2.3.7-1_amd64.deb
-        vagrant plugin install vagrant-vbguest
-
-    - name: Install Packer
-      run: |
-        curl -L https://releases.hashicorp.com/packer/1.9.4/packer_1.9.4_linux_amd64.zip -o packer.zip
-        unzip packer.zip
-        sudo mv packer /usr/local/bin/
 
     - name: Run build
       run: |
