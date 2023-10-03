@@ -31,6 +31,7 @@ jobs:
       run: |
         curl -O https://releases.hashicorp.com/vagrant/2.3.7/vagrant_2.3.7-1_amd64.deb
         sudo dpkg -i vagrant_2.3.7-1_amd64.deb
+        vagrant plugin install vagrant-vbguest
 
     - name: Install Packer
       run: |
