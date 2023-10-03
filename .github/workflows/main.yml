@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ feature/build_pipeline ]
   pull_request:
-    branches: [ master ]
+    branches: [ feature/build_pipeline ]
 
 env:
   LLVM_RELEASE_VERSION: 16
