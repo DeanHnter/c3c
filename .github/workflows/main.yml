@@ -528,6 +528,49 @@ jobs:
           name: c3-ubuntu-22-${{matrix.build_type}}
           path: c3-ubuntu-22-${{matrix.build_type}}.tar.gz
 
+  build-linux-alpine:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type:  [Release, Debug]
+        llvm_version: [17, 18]
+        alpine_version: [3.19]
+    container:
+      image: alpine:${{ matrix.alpine_version }}
+    steps:
+      - name: Install tool-chain and build prerequisites
+        run: |
+          apk add --no-cache \
+            git cmake ninja python3 \
+            clang${{ matrix.llvm_version }} \
+            llvm${{ matrix.llvm_version }} \
+            lld${{ matrix.llvm_version }} \
+            zlib-dev build-base curl
+          # Convenience symlinks so CMake can simply ask for “clang”
+          ln -sf /usr/bin/clang${{ matrix.llvm_version }} /usr/local/bin/clang
+          ln -sf /usr/bin/clang++${{ matrix.llvm_version }} /usr/local/bin/clang++
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Configure
+        run: |
+          cmake -B build -G Ninja \
+                -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+                -DCMAKE_C_COMPILER=clang \
+                -DCMAKE_CXX_COMPILER=clang++ \
+                -DCMAKE_LINKER=lld \
+                -DC3_LLVM_VERSION=${{ matrix.llvm_version }}
+
+      - name: Build
+        run: cmake --build build
+
+      - name: Upload artefacts (optional)
+        uses: actions/upload-artifact@v4
+        with:
+          name: c3-alpine-${{ matrix.build_type }}
+          path: build/c3c
+          
   build-with-docker:
     runs-on: ubuntu-22.04
     strategy:
